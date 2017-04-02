@@ -431,8 +431,8 @@ import com.example.ti.util.PreferenceWR;
                                 totalCharacteristics += chars.size();
                             }
                             //Special profile for Cloud service
-                            mqttProfile = new IBMIoTCloudProfile(context, mBluetoothDevice, null, mBtLeService);
-                            mProfiles.add(mqttProfile);
+                           // mqttProfile = new IBMIoTCloudProfile(context, mBluetoothDevice, null, mBtLeService);
+                           // mProfiles.add(mqttProfile);
                             if (totalCharacteristics == 0) {
                                 //Something bad happened, we have a problem
                                 runOnUiThread(new Runnable() {
@@ -486,12 +486,12 @@ import com.example.ti.util.PreferenceWR;
                             }
                             for (int ii = 0; ii < serviceList.size(); ii++) {
                                 BluetoothGattService s = serviceList.get(ii);
-                                List<BluetoothGattCharacteristic> chars = s.getCharacteristics();
+                               /* List<BluetoothGattCharacteristic> chars = s.getCharacteristics();
                                 if (chars.size() == 0) {
 
                                     Log.d("DeviceActivity", "No characteristics found for this service !!!");
                                     return;
-                                }
+                                }*/
                                 servicesDiscovered++;
                                 final float serviceDiscoveredcalc = (float)servicesDiscovered;
                                 final float serviceTotalcalc = (float)serviceList.size();
