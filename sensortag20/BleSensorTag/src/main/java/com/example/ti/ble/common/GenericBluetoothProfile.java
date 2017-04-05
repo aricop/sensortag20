@@ -62,10 +62,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TableRow;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.sql.Timestamp;
 import java.util.Map;
 
 public class GenericBluetoothProfile {
@@ -81,6 +90,10 @@ public class GenericBluetoothProfile {
 	protected boolean isRegistered;
     public boolean isConfigured;
     public boolean isEnabled;
+
+	public String pathStr;	//directorio en string
+	public long lastSent;	//referencia del ultimo dato enviado por UDP
+
 	public GenericBluetoothProfile(final Context con,BluetoothDevice device,BluetoothGattService service,BluetoothLeService controller) {
 		super();
 		this.mBTDevice = device;
@@ -275,4 +288,35 @@ public class GenericBluetoothProfile {
             e.printStackTrace();
         }
     }
+
+
+	public class sendUDP extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... path) {
+			//string
+			//tomamos la medida del tiempo actual
+			try {
+				lastSent = (System.currentTimeMillis());    //actualizamos el tiempo al ultimo envio
+
+				//Creamos el datagramsocket
+				int server_port = 2003;
+				InetAddress server_address = InetAddress.getByName("visualizee.die.upm.es");
+				DatagramSocket s = new DatagramSocket();
+
+				//Creamos el datagrampacket
+				byte[] pathBuf = pathStr.getBytes();
+				DatagramPacket p = new DatagramPacket(pathBuf, pathStr.length(), server_address, server_port);
+
+				//enviamos el paquete
+				s.send(p);
+
+				return null;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+	}
 }

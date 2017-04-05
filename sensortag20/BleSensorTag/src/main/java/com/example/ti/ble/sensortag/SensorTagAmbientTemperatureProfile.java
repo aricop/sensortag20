@@ -52,6 +52,8 @@
  **************************************************************************************************/
 package com.example.ti.ble.sensortag;
 
+import java.io.IOException;
+import java.sql.Timestamp;	//añadida para obtener el tiempo
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.ti.ble.common.BluetoothLeService;
@@ -134,6 +137,17 @@ public class SensorTagAmbientTemperatureProfile extends GenericBluetoothProfile 
 				else this.tRow.value.setText(String.format("%.1f°C", v.x));
 			}
 			this.tRow.sl1.addValue((float)v.x);
+
+
+			long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
+
+			if(timeNow > lastSent + 300000){
+
+				pathStr = "migraine.p0.temp " + (float)v.x + " " + timeNow/1000;
+				new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+			}
+
 		}
 	}
 	public static boolean isCorrectService(BluetoothGattService service) {
