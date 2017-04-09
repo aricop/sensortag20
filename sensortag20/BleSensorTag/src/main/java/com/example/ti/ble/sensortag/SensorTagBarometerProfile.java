@@ -61,6 +61,7 @@ import java.util.UUID;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.os.AsyncTask;
 import android.content.Context;
 import android.util.Log;
 
@@ -203,6 +204,16 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 			if (this.tRow.config == false) this.tRow.value.setText(String.format("%.1f mBar %.1f meter", v.x / 100, h));
 			this.tRow.sl1.addValue((float)v.x / 100.0f);
 			//mBarValue.setText(msg);
+
+			long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
+
+			if(timeNow > lastSentPre + 300000){
+
+				pathStr = "migraine.p1.pre " + (float)v.x/100.0f + " " + timeNow/1000;
+				lastSentPre = (System.currentTimeMillis());
+				new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+			}
 		}
 	}
 	

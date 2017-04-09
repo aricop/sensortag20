@@ -92,7 +92,11 @@ public class GenericBluetoothProfile {
     public boolean isEnabled;
 
 	public String pathStr;	//directorio en string
-	public long lastSent;	//referencia del ultimo dato enviado por UDP
+	public long lastSentTemp;	//referencia del ultimo dato de temperatura enviado por UDP
+	public long lastSentLux;	//referencia del ultimo dato de luminosidad enviado por UDP
+	public long lastSentHum;	//referencia del ultimo dato de humedad enviado por UDP
+	public long lastSentPre;	//referencia del ultimo dato de presión enviado por UDP
+
 
 	public GenericBluetoothProfile(final Context con,BluetoothDevice device,BluetoothGattService service,BluetoothLeService controller) {
 		super();
@@ -297,7 +301,7 @@ public class GenericBluetoothProfile {
 			//string
 			//tomamos la medida del tiempo actual
 			try {
-				lastSent = (System.currentTimeMillis());    //actualizamos el tiempo al ultimo envio
+				//lastSentTemp = (System.currentTimeMillis());    //actualizamos el tiempo al ultimo envio
 
 				//Creamos el datagramsocket
 				int server_port = 2003;

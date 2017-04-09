@@ -62,6 +62,7 @@ import java.util.UUID;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.os.AsyncTask;
 import android.content.Context;
 
 import com.example.ti.ble.common.BluetoothLeService;
@@ -112,6 +113,16 @@ public class SensorTagLuxometerProfile extends GenericBluetoothProfile {
 					Point3D v = Sensor.LUXOMETER.convert(value);
 					if (this.tRow.config == false) this.tRow.value.setText(String.format("%.1f Lux", v.x));
 					this.tRow.sl1.addValue((float)v.x);
+
+					long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
+
+					if(timeNow > lastSentLux + 300000){
+
+						pathStr = "migraine.p1.lux " + (float)v.x + " " + timeNow/1000;
+						lastSentLux = (System.currentTimeMillis());
+						new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+					}
 				}
 		}
     @Override

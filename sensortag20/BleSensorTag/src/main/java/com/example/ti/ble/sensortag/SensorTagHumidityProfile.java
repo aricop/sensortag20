@@ -60,6 +60,7 @@ import java.util.UUID;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.os.AsyncTask;
 import android.content.Context;
 import android.util.Log;
 
@@ -122,6 +123,16 @@ public class SensorTagHumidityProfile extends GenericBluetoothProfile {
 					this.tRow.sl1.maxVal = 100;
 					this.tRow.sl1.minVal = 0;
 					this.tRow.sl1.addValue((float)v.x);
+
+					long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
+
+					if(timeNow > lastSentHum + 300000){
+
+						pathStr = "migraine.p1.hum " + (float)v.x + " " + timeNow/1000;
+						lastSentHum = (System.currentTimeMillis());
+						new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+					}
 				}
 		}
     @Override

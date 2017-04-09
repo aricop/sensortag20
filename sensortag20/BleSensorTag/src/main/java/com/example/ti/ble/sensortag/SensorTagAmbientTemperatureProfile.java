@@ -141,9 +141,10 @@ public class SensorTagAmbientTemperatureProfile extends GenericBluetoothProfile 
 
 			long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
 
-			if(timeNow > lastSent + 300000){
+			if(timeNow > lastSentTemp + 300000){
 
-				pathStr = "migraine.p0.temp " + (float)v.x + " " + timeNow/1000;
+				pathStr = "migraine.p1.temp " + (float)v.x + " " + timeNow/1000;
+				lastSentTemp = (System.currentTimeMillis());
 				new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 			}
