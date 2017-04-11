@@ -91,7 +91,7 @@ public class GenericBluetoothProfile {
     public boolean isConfigured;
     public boolean isEnabled;
 
-	public String pathStr;	//directorio en string
+	public String pathStr;		//directorio en string
 	public long lastSentTemp;	//referencia del ultimo dato de temperatura enviado por UDP
 	public long lastSentLux;	//referencia del ultimo dato de luminosidad enviado por UDP
 	public long lastSentHum;	//referencia del ultimo dato de humedad enviado por UDP

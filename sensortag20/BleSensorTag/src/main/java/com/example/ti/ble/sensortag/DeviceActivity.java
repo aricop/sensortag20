@@ -52,6 +52,9 @@
  **************************************************************************************************/
 package com.example.ti.ble.sensortag;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -135,6 +138,8 @@ import com.example.ti.util.PreferenceWR;
 
 	//GUI
 	private List<GenericBluetoothProfile> mProfiles;
+
+    public String pathStr;		//directorio en string
 
 	public DeviceActivity() {
 		mResourceFragmentPager = R.layout.fragment_pager;
@@ -793,4 +798,61 @@ import com.example.ti.util.PreferenceWR;
         }
 
     }
+
+    public void startPain(View view){
+
+        try {
+            //Mandamos un 1 cuando comienza la migraña
+            long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
+            pathStr = "migraine.p1.pain " + 1.0 + " " + timeNow/1000;
+            new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stopPain(View view){
+
+        try {
+            //Mandamos un 1 cuando comienza la migraña
+            long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
+            pathStr = "migraine.p1.pain " + 0.0 + " " + timeNow/1000;
+            new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public class sendUDP extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... path) {
+
+            try {
+
+                //Creamos el datagramsocket
+                int server_port = 2003;
+                InetAddress server_address = InetAddress.getByName("visualizee.die.upm.es");
+                DatagramSocket s = new DatagramSocket();
+
+                //Creamos el datagrampacket
+                byte[] pathBuf = pathStr.getBytes();
+                DatagramPacket p = new DatagramPacket(pathBuf, pathStr.length(), server_address, server_port);
+
+                //enviamos el paquete
+                s.send(p);
+
+                return null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
 }
