@@ -108,6 +108,7 @@ import com.example.ti.ble.common.IBMIoTCloudProfile;
 import com.example.ti.util.PreferenceWR;
 
 
+
 @SuppressLint("InflateParams") public class DeviceActivity extends ViewPagerActivity {
 	// Log
 	// private static String TAG = "DeviceActivity";
@@ -139,7 +140,7 @@ import com.example.ti.util.PreferenceWR;
 	//GUI
 	private List<GenericBluetoothProfile> mProfiles;
 
-    public String pathStr;		//directorio en string
+    public String pathStr;		//directorio del servidor en string
 
 	public DeviceActivity() {
 		mResourceFragmentPager = R.layout.fragment_pager;
@@ -768,6 +769,7 @@ import com.example.ti.util.PreferenceWR;
         }
         @Override
         protected Void doInBackground(String... params) {
+
             Integer ii = 1;
             for (GenericBluetoothProfile p : mProfiles) {
 
@@ -801,12 +803,18 @@ import com.example.ti.util.PreferenceWR;
 
     public void startPain(View view){
 
+        //startclicked = true;
+
         try {
             //Mandamos un 1 cuando comienza la migraña
             long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
-            pathStr = "migraine.p1.pain " + 1.0 + " " + timeNow/1000;
+            pathStr = "visualizee.mig.p1.pain " + 1.0 + " " + timeNow/1000;
             new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
+            //long lastSentNotification;
+            //if(timeNow > lastSentNotification + 60000) {
+                //addNotification();
+               //lastSentNotification = (System.currentTimeMillis());
+            //}
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -816,11 +824,10 @@ import com.example.ti.util.PreferenceWR;
     public void stopPain(View view){
 
         try {
-            //Mandamos un 1 cuando comienza la migraña
+            //Mandamos un 0 cuando termina la migraña
             long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
-            pathStr = "migraine.p1.pain " + 0.0 + " " + timeNow/1000;
+            pathStr = "visualizee.mig.p1.pain " + 0.0 + " " + timeNow/1000;
             new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -846,12 +853,19 @@ import com.example.ti.util.PreferenceWR;
                 //enviamos el paquete
                 s.send(p);
 
+
                 return null;
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            instanceNotification();
         }
     }
 

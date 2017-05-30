@@ -59,6 +59,7 @@ import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -69,7 +70,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import android.support.v4.app.NotificationCompat;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.app.AlarmManager;
+import java.util.Calendar;
+
 import com.example.ti.ble.sensortag.R;
+
+
 
 public class ViewPagerActivity extends FragmentActivity {
   // Constants
@@ -85,6 +94,7 @@ public class ViewPagerActivity extends FragmentActivity {
   protected Menu optionsMenu;
   private MenuItem refreshItem;
   protected boolean mBusy;
+
 
   protected ViewPagerActivity() {
     // Log.d(TAG, "construct");
@@ -246,4 +256,39 @@ public class ViewPagerActivity extends FragmentActivity {
       // Log.d(TAG, "onTabReselected: " + n);
     }
   };
+
+  public void instanceNotification(){
+    final Handler handler = new Handler();
+    handler.postDelayed(new Runnable() {
+      public void run() {
+        addNotification();
+        //handler.postDelayed(this, 30000);
+      }
+    }, 5000);
+  }
+
+  public void addNotification() {
+    NotificationCompat.Builder mBuilder =
+            new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.drawable.unknown)
+                    .setContentTitle("My notification")
+                    .setContentText("Hello World!")
+                    .setVibrate(new long[] {100, 250, 100, 500});
+
+
+    NotificationManager mNotificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    mNotificationManager.notify(1, mBuilder.build());
+
+    /**AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+
+    Calendar calendar = Calendar.getInstance();
+    calendar.set(Calendar.HOUR_OF_DAY, 07);
+    calendar.set(Calendar.MINUTE, 00);
+    calendar.set(Calendar.SECOND, 00);
+
+    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 60 * 1000, null);  //set repeating every 24 hours
+    **/
+  }
+
 }
