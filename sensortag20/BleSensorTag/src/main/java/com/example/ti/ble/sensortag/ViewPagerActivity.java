@@ -95,6 +95,8 @@ public class ViewPagerActivity extends FragmentActivity {
   private MenuItem refreshItem;
   protected boolean mBusy;
 
+  public boolean notif = false;
+
 
   protected ViewPagerActivity() {
     // Log.d(TAG, "construct");
@@ -257,38 +259,44 @@ public class ViewPagerActivity extends FragmentActivity {
     }
   };
 
-  public void instanceNotification(){
+  //NotificationCompat.Builder mBuilder;
+  //NotificationManager mNotificationManager;
+  //final Handler handler = new Handler();
+  //Runnable r;
+  /*public void instanceNotification(){
+
+
     final Handler handler = new Handler();
+    //handler.postDelayed(r = new Runnable() {
+
     handler.postDelayed(new Runnable() {
       public void run() {
         addNotification();
-        //handler.postDelayed(this, 30000);
+        handler.postDelayed(this, 10000);  //envio de notificacion cada 5 min
       }
-    }, 5000);
-  }
+    }, 0);
+  }*/
 
-  public void addNotification() {
+  /*public void addNotification() {
+
     NotificationCompat.Builder mBuilder =
             new NotificationCompat.Builder(this)
                     .setSmallIcon(R.drawable.unknown)
-                    .setContentTitle("My notification")
-                    .setContentText("Hello World!")
+                    .setContentTitle("STOP MIGRAINE")
+                    .setContentText("Recuerda anotar el fin de la migraña")
                     .setVibrate(new long[] {100, 250, 100, 500});
-
 
     NotificationManager mNotificationManager =
             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-    mNotificationManager.notify(1, mBuilder.build());
 
-    /**AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 
-    Calendar calendar = Calendar.getInstance();
-    calendar.set(Calendar.HOUR_OF_DAY, 07);
-    calendar.set(Calendar.MINUTE, 00);
-    calendar.set(Calendar.SECOND, 00);
+    if(notif) {
+      mNotificationManager.notify(1, mBuilder.build());
+    }else {
+      mNotificationManager.cancel(1);
+      //handler.removeCallbacks(r);
 
-    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 60 * 1000, null);  //set repeating every 24 hours
-    **/
-  }
+    }
+  }*/
 
 }

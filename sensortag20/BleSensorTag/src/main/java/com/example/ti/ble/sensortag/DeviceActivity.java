@@ -803,18 +803,12 @@ import com.example.ti.util.PreferenceWR;
 
     public void startPain(View view){
 
-        //startclicked = true;
-
+        //notif = true;
         try {
             //Mandamos un 1 cuando comienza la migraña
             long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
             pathStr = "visualizee.mig.p1.pain " + 1.0 + " " + timeNow/1000;
             new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            //long lastSentNotification;
-            //if(timeNow > lastSentNotification + 60000) {
-                //addNotification();
-               //lastSentNotification = (System.currentTimeMillis());
-            //}
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -823,6 +817,7 @@ import com.example.ti.util.PreferenceWR;
 
     public void stopPain(View view){
 
+        //notif = false;
         try {
             //Mandamos un 0 cuando termina la migraña
             long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
@@ -862,11 +857,13 @@ import com.example.ti.util.PreferenceWR;
             return null;
         }
 
-        @Override
+        /*@Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            instanceNotification();
-        }
+            if(notif) {         //Con esto evitamos que mande notificacion cuando pulsamos STOP
+                instanceNotification();
+            }
+        }*/
     }
 
 }

@@ -77,6 +77,9 @@ import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.Map;
 
+import android.net.NetworkInfo;
+import android.net.ConnectivityManager;
+
 public class GenericBluetoothProfile {
 	protected BluetoothDevice mBTDevice;
 	protected BluetoothGattService mBTService;
@@ -92,10 +95,11 @@ public class GenericBluetoothProfile {
     public boolean isEnabled;
 
 	public String pathStr;		//directorio en string
-	public long lastSentTemp;	//referencia del ultimo dato de temperatura enviado por UDP
-	public long lastSentLux;	//referencia del ultimo dato de luminosidad enviado por UDP
-	public long lastSentHum;	//referencia del ultimo dato de humedad enviado por UDP
-	public long lastSentPre;	//referencia del ultimo dato de presión enviado por UDP
+	public long lastSentTemp = (System.currentTimeMillis());	//referencia del ultimo dato de temperatura enviado por UDP
+	public long lastSentLux = (System.currentTimeMillis());	//referencia del ultimo dato de luminosidad enviado por UDP
+	public long lastSentHum = (System.currentTimeMillis());	//referencia del ultimo dato de humedad enviado por UDP
+	public long lastSentPre = (System.currentTimeMillis());	//referencia del ultimo dato de presión enviado por UDP
+	public float averageData;
 
 
 	public GenericBluetoothProfile(final Context con,BluetoothDevice device,BluetoothGattService service,BluetoothLeService controller) {
@@ -292,6 +296,48 @@ public class GenericBluetoothProfile {
             e.printStackTrace();
         }
     }
+
+	/**
+	 * Get the network info
+	 * @param context
+	 * @return
+	 */
+	public static NetworkInfo getNetworkInfo(Context context){
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		return cm.getActiveNetworkInfo();
+	}
+
+	/**
+	 * Check if there is any connectivity
+	 * @param context
+	 * @return
+	 */
+	public static boolean isConnected(Context context){
+		NetworkInfo info = getNetworkInfo(context);
+		return (info != null && info.isConnected());
+	}
+
+	/**
+	 * Check if there is any connectivity to a Wifi network
+	 * @param context
+	 * @param type
+	 * @return
+	 */
+	public static boolean isConnectedWifi(Context context){
+		NetworkInfo info = getNetworkInfo(context);
+		return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI);
+	}
+
+	/**
+	 * Check if there is any connectivity to a mobile network
+	 * @param context
+	 * @param type
+	 * @return
+	 */
+	public static boolean isConnectedMobile(Context context){
+		NetworkInfo info = getNetworkInfo(context);
+		return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_MOBILE);
+	}
 
 
 	public class sendUDP extends AsyncTask<Void, Void, Void> {

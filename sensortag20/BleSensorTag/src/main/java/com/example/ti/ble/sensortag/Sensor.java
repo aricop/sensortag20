@@ -265,8 +265,11 @@ public enum Sensor {
 
 			if (DeviceActivity.getInstance().isSensorTag2()) {
                 if (value.length > 4) {
-                    Integer val = twentyFourBitUnsignedAtOffset(value, 2);
-                    return new Point3D((double) val / 100.0, 0, 0);
+                    /*Integer val = twentyFourBitUnsignedAtOffset(value, 2);
+                    return new Point3D((double) val / 100.0, 0, 0);*/
+
+					double val = ((value[3] & 0xff) + ((value[4]<<8) & 0xff00) + ((value[5]<<16) & 0xff0000));
+					return new Point3D((double) val, 0, 0);
                 }
 				else {
                     int mantissa;
@@ -338,8 +341,8 @@ public enum Sensor {
 		return (upperByte << 8) + lowerByte;
 	}
     private static Integer twentyFourBitUnsignedAtOffset(byte[] c, int offset) {
-        Integer lowerByte = (int) c[offset] & 0xFF;
-        Integer mediumByte = (int) c[offset+1] & 0xFF;
+        Integer lowerByte = (int) c[offset] & 0x00;
+        Integer mediumByte = (int) c[offset+1] & 0x00;
         Integer upperByte = (int) c[offset + 2] & 0xFF;
         return (upperByte << 16) + (mediumByte << 8) + lowerByte;
     }

@@ -106,6 +106,7 @@ public class SensorTagLuxometerProfile extends GenericBluetoothProfile {
 			}
 			else return false;
 		}
+	boolean firstData = true;
     @Override
     public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
         byte[] value = c.getValue();
@@ -116,11 +117,20 @@ public class SensorTagLuxometerProfile extends GenericBluetoothProfile {
 
 					long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
 
-					if(timeNow > lastSentLux + 300000){
+					if(!firstData){
+						averageData += (float)v.x;
+					}
+					firstData = false;
 
-						pathStr = "migraine.p1.lux " + (float)v.x + " " + timeNow/1000;
+					System.out.println("El dato de luminosidad vale: " + (float)v.x);
+					System.out.println("la luminiosidad media vale: " + averageData);
+
+					if(timeNow > lastSentLux + 300000){
+						averageData = averageData / 5;
+						pathStr = "visualizee.mig.p1.lux " + averageData + " " + timeNow/1000;
 						lastSentLux = (System.currentTimeMillis());
 						new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+						averageData = 0;
 
 					}
 				}

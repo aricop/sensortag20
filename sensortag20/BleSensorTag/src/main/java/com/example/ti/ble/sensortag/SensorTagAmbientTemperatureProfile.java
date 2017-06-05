@@ -70,6 +70,7 @@ import com.example.ti.ble.common.GenericBluetoothProfile;
 import com.example.ti.util.GenericCharacteristicTableRow;
 import com.example.ti.util.Point3D;
 
+
 public class SensorTagAmbientTemperatureProfile extends GenericBluetoothProfile {
 	public SensorTagAmbientTemperatureProfile(Context con,BluetoothDevice device,BluetoothGattService service,BluetoothLeService controller) {
 		super(con,device,service,controller);
@@ -127,6 +128,7 @@ public class SensorTagAmbientTemperatureProfile extends GenericBluetoothProfile 
         }
         this.isConfigured = false;
 	}
+	boolean firstData = true;
     @Override
     public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
         byte[] value = c.getValue();
@@ -140,17 +142,51 @@ public class SensorTagAmbientTemperatureProfile extends GenericBluetoothProfile 
 
 
 			long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
+			if(!firstData){
+				averageData += (float)v.x;
+			}
+			firstData = false;
+
+            //float[] bufferData = new float[12];
+            //long[] bufferTime = new long[12];
+			System.out.println("El dato de temperatura vale: " + (float)v.x);
+			System.out.println("la temperatura media vale: " + averageData);
 
 			if(timeNow > lastSentTemp + 300000){
-
-				pathStr = "migraine.p1.temp " + (float)v.x + " " + timeNow/1000;
-				lastSentTemp = (System.currentTimeMillis());
-				new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-			}
-
+				//if(isConnected(context)){
+					averageData = averageData / 5;
+					pathStr = "visualizee.mig.p1.temp " + averageData + " " + timeNow/1000;
+					lastSentTemp = (System.currentTimeMillis());
+					new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+					averageData = 0;
+				//}else {
+					//saveData(timeNow, bufferData, bufferTime);
+				//}
+			}//else{
+                //reSend(bufferData, bufferTime);
+            //}
 		}
 	}
+
+	/*public void saveData(long time, float[] x, long[] y){		//alamacena datos hasta 1 hora
+		int i = 0;
+		x[i] = averageData;
+		y[i] = time/1000;
+		i++;
+
+	}*/
+
+	/*public void reSend(float[] x, long[] y){
+		for (int i=0; i<x.length; i++) {
+			if(isConnected(context) && x[i] != 0 && y[i] != 0){
+				pathStr = "visualizee.mig.p1.temp " + x[i] + " " + y[i]/1000;
+				new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                x[i] = (float)0;
+                y[i] = (long)0;
+			}
+		}
+	}*/
+
 	public static boolean isCorrectService(BluetoothGattService service) {
 		if ((service.getUuid().toString().compareTo(SensorTagGatt.UUID_IRT_SERV.toString())) == 0) {
 			return true;

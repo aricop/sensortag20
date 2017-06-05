@@ -185,6 +185,7 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
             }
         }
 	}
+	boolean firstData = true;
 	@Override 
 	public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
         byte[] value = c.getValue();
@@ -206,12 +207,20 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 			//mBarValue.setText(msg);
 
 			long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
+			if(!firstData){
+				averageData += (float)v.x;		//media de los 5 minutos (P)
+			}
+			firstData = false;
+
+			System.out.println("El dato de presion vale: " + (float)v.x);
+			System.out.println("La presion media vale: " + averageData);
 
 			if(timeNow > lastSentPre + 300000){
-
-				pathStr = "migraine.p1.pre " + (float)v.x/100.0f + " " + timeNow/1000;
+				averageData = averageData / 5;
+				pathStr = "visualizee.mig.p1.pre " + averageData/100.0f + " " + timeNow/1000;
 				lastSentPre = (System.currentTimeMillis());
 				new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+				averageData = 0;
 
 			}
 		}
