@@ -122,8 +122,8 @@ public class SensorTagLuxometerProfile extends GenericBluetoothProfile {
 					}
 					firstData = false;
 
-					System.out.println("El dato de luminosidad vale: " + (float)v.x);
-					System.out.println("la luminiosidad media vale: " + averageData);
+					//System.out.println("El dato de luminosidad vale: " + (float)v.x);
+					//System.out.println("la luminosidad media vale: " + averageData);
 
 					if(timeNow > lastSentLux + 300000){
 						averageData = averageData / 5;

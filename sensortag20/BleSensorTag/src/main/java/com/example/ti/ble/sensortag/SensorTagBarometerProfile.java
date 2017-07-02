@@ -212,8 +212,8 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 			}
 			firstData = false;
 
-			System.out.println("El dato de presion vale: " + (float)v.x);
-			System.out.println("La presion media vale: " + averageData);
+			//System.out.println("El dato de presion vale: " + (float)v.x);
+			//System.out.println("La presion media vale: " + averageData);
 
 			if(timeNow > lastSentPre + 300000){
 				averageData = averageData / 5;

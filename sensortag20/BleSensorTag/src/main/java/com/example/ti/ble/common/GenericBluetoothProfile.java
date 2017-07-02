@@ -369,4 +369,50 @@ public class GenericBluetoothProfile {
 			return null;
 		}
 	}
+
+
+
+	public class reSendData extends AsyncTask<Void, Void, String> {
+
+		float[] x;
+		long[] y;
+		int i = 0;
+
+		public reSendData(float[] bufferData, long[] bufferTime){
+			this.x = bufferData;
+			this.y = bufferTime;
+		}
+
+		@Override
+		protected String doInBackground(Void... params) {
+			//string
+			//tomamos la medida del tiempo actual
+
+			try {
+				if(isConnected(context)) {
+					for (i = 0; i < x.length; i++) {
+						if (x[i] != 0 && y[i] != 0) {
+							return pathStr = "visualizee.mig.p1.temp " + x[i] + " " + y[i]/1000;
+						}
+					}
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			if(result!=null){
+				new sendUDP() .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+				System.out.println("EL DATO ALMACENADO QUE SE HA ENVIADO ES: " + x[i]);
+				System.out.println("EL TIEMPO ALMACENADO QUE SE HA ENVIADO ES: " + y[i]);
+				x[i] = (float) 0;
+				y[i] = (long) 0;
+			}
+		}
+	}
 }

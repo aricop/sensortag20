@@ -74,6 +74,8 @@ import android.support.v4.app.NotificationCompat;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.app.AlarmManager;
+import android.widget.Toast;
+
 import java.util.Calendar;
 
 import com.example.ti.ble.sensortag.R;
@@ -94,9 +96,6 @@ public class ViewPagerActivity extends FragmentActivity {
   protected Menu optionsMenu;
   private MenuItem refreshItem;
   protected boolean mBusy;
-
-  public boolean notif = false;
-
 
   protected ViewPagerActivity() {
     // Log.d(TAG, "construct");
@@ -259,44 +258,71 @@ public class ViewPagerActivity extends FragmentActivity {
     }
   };
 
-  //NotificationCompat.Builder mBuilder;
-  //NotificationManager mNotificationManager;
-  //final Handler handler = new Handler();
-  //Runnable r;
-  /*public void instanceNotification(){
 
+  private NotificationManager mNotificationManager;
+  private Handler handler;
+  private Runnable r;
 
-    final Handler handler = new Handler();
-    //handler.postDelayed(r = new Runnable() {
+  /**
+   * Instancia la notificacion si no hay una ya instanciada (mNotificationManager!=null --> instanciada)
+   */
+  public void instanceNotification(){
 
-    handler.postDelayed(new Runnable() {
-      public void run() {
-        addNotification();
-        handler.postDelayed(this, 10000);  //envio de notificacion cada 5 min
-      }
-    }, 0);
-  }*/
+    //Log.i(getClass().getSimpleName(), "instanceNotification??");
 
-  /*public void addNotification() {
+    if(mNotificationManager==null) {
 
-    NotificationCompat.Builder mBuilder =
-            new NotificationCompat.Builder(this)
-                    .setSmallIcon(R.drawable.unknown)
-                    .setContentTitle("STOP MIGRAINE")
-                    .setContentText("Recuerda anotar el fin de la migraña")
-                    .setVibrate(new long[] {100, 250, 100, 500});
+      mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-    NotificationManager mNotificationManager =
-            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-
-    if(notif) {
-      mNotificationManager.notify(1, mBuilder.build());
-    }else {
-      mNotificationManager.cancel(1);
-      //handler.removeCallbacks(r);
-
+      //Log.i(getClass().getSimpleName(), "YES instancio");
+      Toast.makeText(this, "Notificacion añadida" +
+              "", Toast.LENGTH_SHORT).show();
+      handler = new Handler();
+      handler.postDelayed(new Runnable() {
+        public void run() {
+          addNotification();
+          handler.postDelayed(this, 30000);  //envio de notificacion cada 5 min
+        }
+      }, 0);
     }
-  }*/
+    else {
+      //Log.i(getClass().getSimpleName(), "NO ya instanciada");
+      Toast.makeText(this, "Ya has pulsado en start antes", Toast.LENGTH_SHORT).show();
+    }
+  }
+
+  /**
+   * Muestra la notificación
+   */
+  public void addNotification() {
+    //Log.i(getClass().getSimpleName(), "addNotification");
+
+    mNotificationManager.cancelAll();
+
+    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+            .setSmallIcon(R.drawable.unknown)
+            .setContentTitle("STOP MIGRAINE")
+            .setContentText("Recuerda anotar el fin de la migraña")
+            .setVibrate(new long[]{100, 250, 100, 500});
+
+    mNotificationManager.notify(1, mBuilder.build());
+  }
+
+  /**
+   * Cancela la notificación
+   */
+  public void stopNotification(){
+    //Log.i(getClass().getSimpleName(), "stopNotification??");
+
+    if(mNotificationManager!=null){
+      Toast.makeText(this, "Notificacion borrada", Toast.LENGTH_SHORT).show();
+      //Log.i(getClass().getSimpleName(), "YES paramos");
+      mNotificationManager.cancel(1);
+      mNotificationManager = null;
+      handler.removeCallbacks(r);
+      handler.removeCallbacksAndMessages(r);
+    }
+
+  }
 
 }

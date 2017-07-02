@@ -265,11 +265,21 @@ public enum Sensor {
 
 			if (DeviceActivity.getInstance().isSensorTag2()) {
                 if (value.length > 4) {
+
+					/*Integer lowerByte = (int) value[3] & 0xFF;
+					System.out.println("NEW lowerbyte: " + lowerByte);
+					Integer mediumByte = (int) value[4] & 0xFF;
+					System.out.println("NEW mediumbyte: " + mediumByte);
+					Integer upperByte = (int) value[5] & 0xFF;
+					System.out.println("NEW upperbyte: " + upperByte);
+					System.out.println("todo concatenado vale: " + ((upperByte << 16) + (mediumByte << 8) + lowerByte));
+					System.out.println("transformado a double vale: " + (double)((upperByte << 16) + (mediumByte << 8) + lowerByte));*/
+					double val = ((value[3] & 0xff) + ((value[4]<<8) & 0xff00) + ((value[5]<<16) & 0xff0000));
+					return new Point3D((double) val, 0, 0);
+
                     /*Integer val = twentyFourBitUnsignedAtOffset(value, 2);
                     return new Point3D((double) val / 100.0, 0, 0);*/
 
-					double val = ((value[3] & 0xff) + ((value[4]<<8) & 0xff00) + ((value[5]<<16) & 0xff0000));
-					return new Point3D((double) val, 0, 0);
                 }
 				else {
                     int mantissa;
@@ -341,9 +351,14 @@ public enum Sensor {
 		return (upperByte << 8) + lowerByte;
 	}
     private static Integer twentyFourBitUnsignedAtOffset(byte[] c, int offset) {
-        Integer lowerByte = (int) c[offset] & 0x00;
-        Integer mediumByte = (int) c[offset+1] & 0x00;
+        Integer lowerByte = (int) c[offset] & 0xFF;
+		System.out.println("OLD lowerbyte: " + lowerByte);
+        Integer mediumByte = (int) c[offset+1] & 0xFF;
+		System.out.println("OLD mediumbyte: " + mediumByte);
         Integer upperByte = (int) c[offset + 2] & 0xFF;
+		System.out.println("OLD upperbyte: " + upperByte);
+		System.out.println("todo concatenado vale: " + ((upperByte << 16) + (mediumByte << 8) + lowerByte));
+		System.out.println("transformado a double vale: " + (double)((upperByte << 16) + (mediumByte << 8) + lowerByte));
         return (upperByte << 16) + (mediumByte << 8) + lowerByte;
     }
 

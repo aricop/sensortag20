@@ -90,6 +90,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -117,6 +118,7 @@ import com.example.ti.util.PreferenceWR;
 	public static final String EXTRA_DEVICE = "EXTRA_DEVICE";
 	private static final int PREF_ACT_REQ = 0;
 	private static final int FWUPDATE_ACT_REQ = 1;
+    private long RESOLUTION = 300000;
 
 	private DeviceView mDeviceView = null;
 
@@ -242,11 +244,34 @@ import com.example.ti.util.PreferenceWR;
 		case R.id.opt_about:
 			openAboutDialog();
 			break;
+        case R.id.opt_resolution:
+            chooseResolution();
+            break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 		return true;
 	}
+
+
+    public void chooseResolution(){
+        AlertDialog.Builder alert = new AlertDialog.Builder(DeviceActivity.this);
+        LayoutInflater inflater=DeviceActivity.this.getLayoutInflater();
+        //this is what I did to added the layout to the alert dialog
+        View layout=inflater.inflate(R.layout.dialog_resolution,null);
+        alert.setView(layout);
+        final EditText resolutionInput=(EditText)layout.findViewById(R.id.edtResolution);
+        resolutionInput.setText(String.valueOf(RESOLUTION));
+        alert.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                RESOLUTION = Long.parseLong(resolutionInput.getText().toString());
+            }
+        });
+        alert.show();
+}
+
+
 	public boolean isEnabledByPrefs(String prefName) {
 		String preferenceKeyString = "pref_"
 				+ prefName;
@@ -556,7 +581,7 @@ import com.example.ti.util.PreferenceWR;
                                     Log.d("DeviceActivity","Found Barometer !");
                                 }
                                 if (SensorTagAmbientTemperatureProfile.isCorrectService(s)) {
-                                    SensorTagAmbientTemperatureProfile irTemp = new SensorTagAmbientTemperatureProfile(context,mBluetoothDevice,s,mBtLeService);
+                                    SensorTagAmbientTemperatureProfile irTemp = new SensorTagAmbientTemperatureProfile(context,mBluetoothDevice,s,mBtLeService, RESOLUTION);
                                     mProfiles.add(irTemp);
                                     if (nrNotificationsOn < maxNotifications) {
                                         irTemp.configureService();
@@ -803,12 +828,12 @@ import com.example.ti.util.PreferenceWR;
 
     public void startPain(View view){
 
-        //notif = true;
         try {
             //Mandamos un 1 cuando comienza la migraña
             long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
             pathStr = "visualizee.mig.p1.pain " + 1.0 + " " + timeNow/1000;
             new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            instanceNotification();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -817,12 +842,12 @@ import com.example.ti.util.PreferenceWR;
 
     public void stopPain(View view){
 
-        //notif = false;
         try {
             //Mandamos un 0 cuando termina la migraña
             long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
             pathStr = "visualizee.mig.p1.pain " + 0.0 + " " + timeNow/1000;
             new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            stopNotification();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -857,13 +882,6 @@ import com.example.ti.util.PreferenceWR;
             return null;
         }
 
-        /*@Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            if(notif) {         //Con esto evitamos que mande notificacion cuando pulsamos STOP
-                instanceNotification();
-            }
-        }*/
     }
 
 }

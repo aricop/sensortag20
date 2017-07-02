@@ -72,10 +72,13 @@ import com.example.ti.util.Point3D;
 
 
 public class SensorTagAmbientTemperatureProfile extends GenericBluetoothProfile {
-	public SensorTagAmbientTemperatureProfile(Context con,BluetoothDevice device,BluetoothGattService service,BluetoothLeService controller) {
+
+	long resolution = 300000;
+
+	public SensorTagAmbientTemperatureProfile(Context con,BluetoothDevice device,BluetoothGattService service,BluetoothLeService controller, long resol) {
 		super(con,device,service,controller);
 		this.tRow =  new GenericCharacteristicTableRow(con);
-		
+		this.resolution = resol;
 		List<BluetoothGattCharacteristic> characteristics = this.mBTService.getCharacteristics();
 		
 		for (BluetoothGattCharacteristic c : characteristics) {
@@ -129,6 +132,8 @@ public class SensorTagAmbientTemperatureProfile extends GenericBluetoothProfile 
         this.isConfigured = false;
 	}
 	boolean firstData = true;
+	float[] bufferData = new float[12];
+	long[] bufferTime = new long[12];
     @Override
     public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
         byte[] value = c.getValue();
@@ -141,51 +146,73 @@ public class SensorTagAmbientTemperatureProfile extends GenericBluetoothProfile 
 			this.tRow.sl1.addValue((float)v.x);
 
 
-			long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
+
 			if(!firstData){
-				averageData += (float)v.x;
+				averageData += (float)v.x;		//Descartamos el primer dato que llega al conectarnos
 			}
 			firstData = false;
-
+			//averageData = (float)v.x; //parece que funciona pero cuando añadamos la media hay que ver donde reiniciar
+									// la variable averageData
             //float[] bufferData = new float[12];
             //long[] bufferTime = new long[12];
 			System.out.println("El dato de temperatura vale: " + (float)v.x);
-			System.out.println("la temperatura media vale: " + averageData);
+			System.out.println("La temperatura media vale: " + averageData);
 
-			if(timeNow > lastSentTemp + 300000){
-				//if(isConnected(context)){
-					averageData = averageData / 5;
+			long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
+
+			if(timeNow > lastSentTemp + resolution){
+				if(isConnected(context)){
+					averageData = averageData / 2;
 					pathStr = "visualizee.mig.p1.temp " + averageData + " " + timeNow/1000;
-					lastSentTemp = (System.currentTimeMillis());
 					new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+					lastSentTemp = (System.currentTimeMillis());
 					averageData = 0;
-				//}else {
-					//saveData(timeNow, bufferData, bufferTime);
-				//}
-			}//else{
-                //reSend(bufferData, bufferTime);
-            //}
+					System.out.println("DATO TEMPERATURA ENVIADO: " + averageData);
+					System.out.println("DATO TIEMPO ENVIADO: " + timeNow/1000);
+
+				}else {
+					saveData(timeNow, bufferData, bufferTime);
+					averageData = 0;
+					lastSentTemp = (System.currentTimeMillis());
+					System.out.println("ALMACENANDO DATOS");
+				}
+			}else{
+				new reSendData(bufferData, bufferTime).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+			/*if(dataSaved){
+				reSend(bufferData, bufferTime);
+			}*/
 		}
 	}
+	boolean dataSaved = false;
+	int j = 0;
+	public void saveData(long time, float[] x, long[] y){		//alamacena datos hasta 1 hora
 
-	/*public void saveData(long time, float[] x, long[] y){		//alamacena datos hasta 1 hora
-		int i = 0;
-		x[i] = averageData;
-		y[i] = time/1000;
-		i++;
+		x[j] = averageData/2;
+		y[j] = time;
+		System.out.println("EL DATO ALMACENADO ES: " + x[j]);
+		System.out.println("EL TIEMPO ALMACENADO ES: " + y[j]);
+		j++;
+		dataSaved = true;
 
-	}*/
+	}
 
-	/*public void reSend(float[] x, long[] y){
-		for (int i=0; i<x.length; i++) {
-			if(isConnected(context) && x[i] != 0 && y[i] != 0){
-				pathStr = "visualizee.mig.p1.temp " + x[i] + " " + y[i]/1000;
-				new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                x[i] = (float)0;
-                y[i] = (long)0;
+	public void reSend(float[] x, long[] y){
+		System.out.println("SE EJECUTA reSend");
+		if(isConnected(context)) {
+			for (int i = 0; i < x.length; i++) {
+				if (x[i] != 0 && y[i] != 0) {
+					pathStr = "visualizee.mig.p1.temp " + x[i] + " " + y[i]/1000;
+					new sendUDP() .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+					System.out.println("EL DATO ALMACENADO QUE SE HA ENVIADO ES: " + x[i]);
+					System.out.println("EL TIEMPO ALMACENADO QUE SE HA ENVIADO ES: " + y[i]);
+					x[i] = (float) 0;
+					y[i] = (long) 0;
+				}
 			}
+			dataSaved = false;
 		}
-	}*/
+	}
 
 	public static boolean isCorrectService(BluetoothGattService service) {
 		if ((service.getUuid().toString().compareTo(SensorTagGatt.UUID_IRT_SERV.toString())) == 0) {

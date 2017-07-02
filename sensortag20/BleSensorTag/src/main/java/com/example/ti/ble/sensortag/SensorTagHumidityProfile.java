@@ -127,20 +127,20 @@ public class SensorTagHumidityProfile extends GenericBluetoothProfile {
 
 					long timeNow = (System.currentTimeMillis());	//obtengo el tiempo actual en milisegundos
 
-					if(!firstData){
+					/*if(!firstData){
 						averageData += (float)v.x;		//media de los 5 minutos (P)
 					}
-					firstData = false;
+					firstData = false;*/
 
 					System.out.println("El dato de humedad vale: " + (float)v.x);
 					System.out.println("la humedad media vale: " + averageData);
 
 					if(timeNow > lastSentHum + 300000){
-						averageData = averageData / 5;
+						//averageData = averageData / 5;
 						pathStr = "visualizee.mig.p1.hum " + averageData + " " + timeNow/1000;
 						lastSentHum = (System.currentTimeMillis());
 						new sendUDP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-						averageData = 0;
+						//averageData = 0;
 
 					}
 				}
